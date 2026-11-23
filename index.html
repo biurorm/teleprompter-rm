@@ -42,11 +42,6 @@ button.duzy{font-size:18px;padding:14px}
 #info{font-size:14px;opacity:.75}
 .podp{font-size:13px;opacity:.6;line-height:1.5}
 
-.ekran input.kod,#pilot-wpisz{background:#111;color:#fff;border:1px solid #333;border-radius:12px;padding:12px 16px;font-size:22px;font-family:inherit;letter-spacing:.2em;width:11em}
-#pilot-ster{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:12px;min-height:0}
-#pilot-ster button{font-size:20px;border-radius:18px}
-#p-toggle{grid-column:1/3;font-size:30px!important}
-#pilot-info{font-size:15px;opacity:.85;text-align:center;line-height:1.5}
 .pomoc-pole{font-size:13px;opacity:.65;line-height:1.5}
 
 /* ---------- EKRAN CZYTANIA ---------- */
@@ -62,9 +57,6 @@ button.duzy{font-size:18px;padding:14px}
 .ln.sek.akt{color:#7fe0a8}
 .ln.trzyma{text-shadow:0 0 16px var(--akcent)}
 #toast{position:absolute;left:50%;transform:translateX(-50%);bottom:170px;background:#111;border:1px solid #2f7d53;border-radius:14px;padding:10px 14px;display:flex;gap:12px;align-items:center;font-size:15px;box-shadow:0 8px 30px #000;z-index:5}
-#pilot-okno{position:absolute;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:9}
-#pilot-okno .kar{background:#111;border:1px solid #333;border-radius:18px;padding:22px;width:min(420px,calc(100vw - 32px));display:flex;flex-direction:column;gap:12px;text-align:center}
-#pilot-kod{font-size:56px;font-weight:800;letter-spacing:.15em;color:var(--akcent)}
 #sek-n{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
 .ln.akt .cue{color:var(--akcent)}
 #linia-pomocnicza{position:absolute;left:0;width:100%;height:0;pointer-events:none}
@@ -102,7 +94,6 @@ button.duzy{font-size:18px;padding:14px}
 <div id="lista" class="ekran">
   <header><h1>🎬 Teleprompter RM</h1><span id="wersja"></span></header>
   <button id="nowy" class="glowny duzy">＋ Nowy scenariusz</button>
-  <button id="pilot-start">📱 Pilot: steruj teleprompterem z drugiego telefonu</button>
   <div id="karty"></div>
   <div class="rzad">
     <span class="podp rozciag">Scenariusze zapisują się same na tym urządzeniu. Kopia zapasowa pozwala przenieść je na inny telefon albo komputer.</span>
@@ -134,27 +125,7 @@ Tekst w [nawiasach] to wskazówka dla Ciebie (żółta), np. [uśmiech], [pokaż
     <button id="usun">🗑 Usuń</button>
     <button id="czytaj-btn" class="glowny">▶ Czytaj</button>
   </div>
-  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> litery · <b>PgUp</b> cofnij · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>Esc</b> wróć do tekstu. Pilot do prezentacji też działa.</div>
-</div>
-
-<!-- ======== PILOT (sterowanie z drugiego telefonu) ======== -->
-<div id="pilot" class="ekran ukryty">
-  <header><button id="pilot-wroc">← Wróć</button><b>📱 Pilot</b><span id="pilot-stan-p" class="podp"></span></header>
-  <div id="pilot-laczenie" class="rzad">
-    <span class="pomoc-pole rozciag">Na urządzeniu z tekstem otwórz czytanie, kliknij ⚙ i „📱 Pilot”. Wpisz tutaj pokazany kod. Najlepiej, gdy oba urządzenia są w tej samej sieci Wi-Fi.</span>
-    <input id="pilot-wpisz" inputmode="numeric" maxlength="5" placeholder="12345">
-    <button id="pilot-polacz" class="glowny">Połącz</button>
-  </div>
-  <div id="pilot-ster" class="ukryty">
-    <button id="p-toggle" class="glowny">▶ Start</button>
-    <button id="p-zdanie">↩ Zdanie wstecz</button>
-    <button id="p-pocz">⏮ Od początku</button>
-    <button id="p-wol">− Wolniej</button>
-    <button id="p-szyb">+ Szybciej</button>
-    <button id="p-sekm">‹ Sekcja</button>
-    <button id="p-sekp">Sekcja ›</button>
-  </div>
-  <div id="pilot-info"></div>
+  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> litery · <b>PgUp</b> cofnij o zdanie · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>E</b> wróć do tekstu. <b>Pilot do prezentacji:</b> następny = start/pauza, poprzedni = cofnij o zdanie, B lub kropka = pauza.</div>
 </div>
 
 <!-- ======== CZYTANIE ======== -->
@@ -166,14 +137,7 @@ Tekst w [nawiasach] to wskazówka dla Ciebie (żółta), np. [uśmiech], [pokaż
   <div id="postep"></div>
   <div id="odliczanie" class="ukryty"></div>
   <div id="toast" class="ukryty"><span id="toast-tekst"></span><button id="toast-pocz">↺ Od początku</button></div>
-  <div id="pilot-okno" class="ukryty"><div class="kar">
-    <b>📱 Pilot</b>
-    <div class="pomoc-pole">Na drugim telefonie otwórz Teleprompter RM, wybierz „Pilot” na liście scenariuszy i wpisz kod:</div>
-    <div id="pilot-kod">…</div>
-    <div class="pomoc-pole">albo otwórz ten adres:<br><span id="pilot-link" style="word-break:break-all"></span></div>
-    <div id="pilot-stan" class="pomoc-pole"></div>
-    <button id="pilot-zamknij" class="glowny">Gotowe</button>
-  </div></div>
+  
 
   <div id="pasek">
     <div id="czas"></div>
@@ -202,14 +166,13 @@ Tekst w [nawiasach] to wskazówka dla Ciebie (żółta), np. [uśmiech], [pokaż
     <div class="przel"><button id="lustro-btn">Lustro (szyba)</button></div>
     <label><span>Odliczanie przed startem</span></label>
     <div class="przel" id="przel-odl"><button data-v="0">Bez</button><button data-v="3">3 s</button><button data-v="5">5 s</button></div>
-    <div class="przel"><button id="pilot-btn">📱 Pilot</button></div>
     <div class="przel"><button id="pelny">Pełny ekran</button><button id="reset">Ustawienia domyślne</button></div>
-    <div id="pomoc">Dotknij linii w tekście, żeby przeskoczyć do tego miejsca. Przeciągnij palcem albo kółkiem myszy, żeby przewinąć ręcznie. Pasek zniknie po kilku sekundach, dotknij ekranu żeby wrócić.</div>
+    <div id="pomoc"><b>Pilot do prezentacji:</b> „następny slajd” = start/pauza, „poprzedni” = cofnij o zdanie, przycisk czarnego ekranu (B lub kropka) = pauza. Dotknij linii w tekście, żeby przeskoczyć do tego miejsca. Przeciągnij palcem albo kółkiem myszy, żeby przewinąć ręcznie. Pasek zniknie po kilku sekundach, dotknij ekranu żeby wrócić.</div>
   </div>
 </div>
 
 <script>
-const WERSJA = "v5 (23.11.2026)";
+const WERSJA = "v6 (23.11.2026)";
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 document.getElementById("wersja").textContent = WERSJA;
 
@@ -238,7 +201,7 @@ function nazwa(sc){ return (sc.tytul||"").trim() || ((sc.tekst||"").trim().split
 function dataPl(t){ const d=new Date(t); return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",year:"numeric"})+", "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"}); }
 const biezacy = () => SC.find(x => x.id === aktywny);
 
-function pokazEkran(id){ ["lista","edycja","czytaj","pilot"].forEach(e => $(e).classList.toggle("ukryty", e!==id)); }
+function pokazEkran(id){ ["lista","edycja","czytaj"].forEach(e => $(e).classList.toggle("ukryty", e!==id)); }
 
 function rysujListe(){
   const k = $("karty");
@@ -413,7 +376,6 @@ function rysuj(wymus){
   $("postep").style.width = (maxPos ? Math.min(100, pos/maxPos*100) : 0) + "%";
   const total = liczbaSlow / S.wpm * 60, zost = total * (1 - (maxPos? pos/maxPos : 0));
   $("czas").textContent = `${fmt(zost)} do końca · całość ${fmt(total)}`;
-  wyslijStanLekko();
 }
 
 function petla(t){
@@ -468,7 +430,7 @@ function linieWstecz(n){
 
 function zdanieWstecz(){
   let i = aktIdx - 1; while (i > 0 && !linie[i].zd) i--;
-  skocz((linie[Math.max(i,0)] || {top:0}).top); wyslijStan();
+  skocz((linie[Math.max(i,0)] || {top:0}).top);
 }
 function liczSekcje(){
   sekcje = [];
@@ -485,73 +447,17 @@ function odswiezSek(){
   let c = null; sekcje.forEach(x => { if (x.h <= aktIdx) c = x; });
   biezSek = c ? c.n : ""; $("sek-n").textContent = biezSek || "—";
 }
-function sekNastepna(){ const n = sekcje.find(x => x.h > aktIdx); if (n) skocz(linie[n.f].top); wyslijStan(); }
+function sekNastepna(){ const n = sekcje.find(x => x.h > aktIdx); if (n) skocz(linie[n.f].top); }
 function sekPoprzednia(){
   let k = -1; sekcje.forEach((x,i) => { if (x.h <= aktIdx) k = i; });
   if (k >= 0 && aktIdx > sekcje[k].f) skocz(linie[sekcje[k].f].top);
   else if (k > 0) skocz(linie[sekcje[k-1].f].top);
   else skocz(0);
-  wyslijStan();
 }
-function resetuj(){ stop(); skocz(0); odlTeraz = true; ostPauza = -1; $("toast").classList.add("ukryty"); zapiszPoz(); wyslijStan(); }
+function resetuj(){ stop(); skocz(0); odlTeraz = true; ostPauza = -1; $("toast").classList.add("ukryty"); zapiszPoz(); }
 function zapiszPoz(){ const sc = biezacy(); if (!sc || !maxPos || $("czytaj").classList.contains("ukryty")) return; sc.poz = +(pos/maxPos).toFixed(4); zapiszSC(); }
 let toastT;
 function pokazToast(txt){ $("toast-tekst").textContent = txt; $("toast").classList.remove("ukryty"); clearTimeout(toastT); toastT = setTimeout(() => $("toast").classList.add("ukryty"), 8000); }
-
-/* ---------- pilot (drugi telefon, WebRTC przez PeerJS; tekst nie jest wysyłany, tylko polecenia) ---------- */
-let peer = null, polaczenia = [], ostStan = 0;
-function ladujPeer(){ return new Promise((ok, err) => { if (window.Peer) return ok(); const sc = document.createElement("script"); sc.src = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"; sc.onload = ok; sc.onerror = () => err(new Error("offline")); document.head.appendChild(sc); }); }
-function stanObj(){ const total = liczbaSlow / S.wpm * 60; return {gra: gra || !!odlTimer, wpm:S.wpm, sek:biezSek, zost: Math.round(total * (1 - (maxPos ? pos/maxPos : 0))), jest:true}; }
-function wyslijStan(){ polaczenia.forEach(c => { try{ if (c.open) c.send({stan:stanObj()}); }catch(e){} }); }
-function wyslijStanLekko(){ if (!polaczenia.length) return; const t = performance.now(); if (t - ostStan > 700){ ostStan = t; wyslijStan(); } }
-const KOMENDY = { toggle:()=>przelacz(), zdanie:zdanieWstecz, pocz:resetuj, wol:()=>$("wolniej").click(), szyb:()=>$("szybciej").click(), sekp:sekNastepna, sekm:sekPoprzednia };
-async function uruchomPilot(proba=0){
-  $("pilot-okno").classList.remove("ukryty"); $("pilot-stan").textContent = "Łączę z serwerem…";
-  try { await ladujPeer(); } catch(e){ $("pilot-stan").textContent = "Brak internetu. Pilot wymaga połączenia z siecią."; $("pilot-kod").textContent = "—"; return; }
-  if (peer && peer.open){ $("pilot-stan").textContent = polaczenia.length ? "✓ Pilot połączony" : "Czekam na pilota…"; return; }
-  if (peer){ try{ peer.destroy(); }catch(e){} peer = null; polaczenia = []; }
-  let kod = null; try { kod = localStorage.getItem("tp_kod"); } catch(e){}
-  if (!kod || proba > 0) kod = String(Math.floor(10000 + Math.random()*90000));
-  try { localStorage.setItem("tp_kod", kod); } catch(e){}
-  peer = new Peer("tprm-" + kod);
-  peer.on("open", () => { $("pilot-kod").textContent = kod; $("pilot-link").textContent = location.origin + location.pathname + "?pilot=" + kod; $("pilot-stan").textContent = "Czekam na pilota…"; });
-  peer.on("error", er => { if (er.type === "unavailable-id" && proba < 6) return uruchomPilot(proba+1); $("pilot-stan").textContent = "Błąd połączenia (" + er.type + "). Spróbuj ponownie."; });
-  peer.on("connection", c => {
-    polaczenia.push(c);
-    c.on("open", () => { $("pilot-stan").textContent = "✓ Pilot połączony"; wyslijStan(); });
-    c.on("data", d => { if (d && KOMENDY[d.c] && !$("czytaj").classList.contains("ukryty")){ KOMENDY[d.c](); wyslijStan(); } });
-    c.on("close", () => { polaczenia = polaczenia.filter(x => x !== c); $("pilot-stan").textContent = polaczenia.length ? "✓ Pilot połączony" : "Pilot rozłączony, czekam…"; });
-  });
-}
-$("pilot-btn").onclick = () => { $("ustawienia").classList.add("ukryty"); uruchomPilot(); };
-$("pilot-zamknij").onclick = () => $("pilot-okno").classList.add("ukryty");
-
-// --- strona pilota (urządzenie sterujące) ---
-let peerP = null, conn = null, kodP = "", pilotAktywny = false, ponowT;
-function pilotStatus(t){ $("pilot-stan-p").textContent = t; }
-async function polaczPilot(kod){
-  kodP = kod; pilotAktywny = true; pilotStatus("łączę…");
-  try { await ladujPeer(); } catch(e){ pilotStatus("brak internetu"); return; }
-  if (peerP){ try{ peerP.destroy(); }catch(e){} }
-  peerP = new Peer();
-  peerP.on("error", er => { pilotStatus(er.type === "peer-unavailable" ? "nie znaleziono czytnika o tym kodzie" : "błąd: " + er.type); ponow(); });
-  peerP.on("open", () => {
-    conn = peerP.connect("tprm-" + kod, {reliable:true});
-    conn.on("open", () => { try{ localStorage.setItem("tp_pilot_kod", kod); }catch(e){} pilotStatus("✓ połączono"); $("pilot-laczenie").classList.add("ukryty"); $("pilot-ster").classList.remove("ukryty"); });
-    conn.on("data", d => { if (d && d.stan) pokazStanPilota(d.stan); });
-    conn.on("close", () => { pilotStatus("rozłączono, łączę ponownie…"); ponow(); });
-  });
-}
-function ponow(){ if (!pilotAktywny) return; clearTimeout(ponowT); ponowT = setTimeout(() => { if (pilotAktywny) polaczPilot(kodP); }, 2500); }
-function pokazStanPilota(st){
-  $("p-toggle").textContent = st.gra ? "⏸ Pauza" : "▶ Start";
-  $("pilot-info").textContent = `Tempo ${st.wpm} słów/min${st.sek ? " · sekcja: " + st.sek : ""} · do końca ${fmt(st.zost)}`;
-}
-function wyslij(c){ try{ navigator.vibrate && navigator.vibrate(25); }catch(e){} if (conn && conn.open) conn.send({c}); }
-[["p-toggle","toggle"],["p-zdanie","zdanie"],["p-pocz","pocz"],["p-wol","wol"],["p-szyb","szyb"],["p-sekm","sekm"],["p-sekp","sekp"]].forEach(([id,c]) => $(id).onclick = () => wyslij(c));
-$("pilot-polacz").onclick = () => { const k = $("pilot-wpisz").value.replace(/\D/g,""); if (k.length === 5) polaczPilot(k); else pilotStatus("kod ma 5 cyfr"); };
-$("pilot-start").onclick = () => { pokazEkran("pilot"); let k = ""; try{ k = localStorage.getItem("tp_pilot_kod") || ""; }catch(e){} $("pilot-wpisz").value = k; if (k.length === 5) polaczPilot(k); };
-$("pilot-wroc").onclick = () => { pilotAktywny = false; clearTimeout(ponowT); try{ conn && conn.close(); peerP && peerP.destroy(); }catch(e){} conn = null; peerP = null; $("pilot-ster").classList.add("ukryty"); $("pilot-laczenie").classList.remove("ukryty"); pilotStatus(""); otworzListe(); };
 
 /* ---------- sterowanie ---------- */
 function zmien(klucz, delta, min, max){ S[klucz] = Math.max(min, Math.min(max, S[klucz]+delta)); zapiszUst(); odswiezPrzyciski(); }
@@ -619,9 +525,13 @@ scena.addEventListener("wheel", e => { e.preventDefault(); skocz(pos + e.deltaY)
 
 addEventListener("keydown", e => {
   if ($("czytaj").classList.contains("ukryty")){ if (e.key==="Escape" && !$("edycja").classList.contains("ukryty")) $("do-listy").click(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();   // fokus na przycisku nie może dublować klawisza
   const k = e.key;
-  if (k===" "||k==="PageDown"||k==="ArrowRight"||k==="Enter"){ e.preventDefault(); przelacz(); }
-  else if (k==="PageUp"||k==="ArrowLeft"||k==="z"||k==="Z"){ e.preventDefault(); zdanieWstecz(); }
+  // PILOT DO PREZENTACJI: "następny slajd" = start/pauza, "poprzedni" = cofnij o zdanie, "." lub B (czarny ekran) = pauza, F5 = start/pauza
+  if (k===" "||k==="PageDown"||k==="ArrowRight"||k==="Enter"||k==="F5"||k==="MediaTrackNext"){ e.preventDefault(); przelacz(); }
+  else if (k==="PageUp"||k==="ArrowLeft"||k==="z"||k==="Z"||k==="MediaTrackPrevious"){ e.preventDefault(); zdanieWstecz(); }
+  else if (k==="."||k==="b"||k==="B"||k==="Escape"){ e.preventDefault(); if (gra || odlTimer) stop(); }
   else if (k==="ArrowUp"){ e.preventDefault(); $("szybciej").click(); }
   else if (k==="ArrowDown"){ e.preventDefault(); $("wolniej").click(); }
   else if (k==="+"||k==="="){ $("wieksze").click(); }
@@ -629,7 +539,7 @@ addEventListener("keydown", e => {
   else if (k==="Home"){ $("od-poczatku").click(); }
   else if (k==="m"||k==="M"){ $("lustro-btn").click(); }
   else if (k==="f"||k==="F"){ pelnyEkran(); }
-  else if (k==="Escape"){ if(!document.fullscreenElement) $("wroc").click(); }
+  else if (k==="e"||k==="E"){ $("wroc").click(); }
 });
 
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if($("czytaj").classList.contains("ukryty")) return; przebuduj(); }, 150); });
@@ -647,7 +557,6 @@ function otworzCzytanie(){
 }
 
 odswiezPrzyciski(); otworzListe();
-{ const k = new URLSearchParams(location.search).get("pilot"); if (k && /^\d{5}$/.test(k)){ $("pilot-start").click(); $("pilot-wpisz").value = k; polaczPilot(k); } }
 </script>
 </body>
 </html>
