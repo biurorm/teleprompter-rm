@@ -137,7 +137,7 @@ Tekst w [nawiasach kwadratowych] to wskazówka dla Ciebie (np. [pauza], [uśmiec
 
   <div id="ustawienia" class="ukryty">
     <label><span class="wiersz"><span>Gdzie jest czytana linia</span><b id="v-fokus"></b></span>
-      <input type="range" id="fokus" min="8" max="55" step="1"></label>
+      <input type="range" id="fokus" min="0" max="55" step="1"></label>
     <label><span class="wiersz"><span>Szerokość tekstu</span><b id="v-szer"></b></span>
       <input type="range" id="szer" min="40" max="100" step="1"></label>
     <label><span class="wiersz"><span>Widoczność wygaszonego tekstu</span><b id="v-wyg"></b></span>
@@ -145,21 +145,25 @@ Tekst w [nawiasach kwadratowych] to wskazówka dla Ciebie (np. [pauza], [uśmiec
     <label><span class="wiersz"><span>Odstęp między liniami</span><b id="v-odst"></b></span>
       <input type="range" id="odst" min="110" max="200" step="5"></label>
     <div class="przel" id="przel-wyr"><button data-v="center">Wyśrodkowany</button><button data-v="left">Do lewej</button></div>
-    <div class="przel"><button id="lustro-btn">Lustro (szyba)</button><button id="odl-btn">Odliczanie 3-2-1</button></div>
+    <div class="przel"><button id="lustro-btn">Lustro (szyba)</button></div>
+    <label><span>Odliczanie przed startem</span></label>
+    <div class="przel" id="przel-odl"><button data-v="0">Bez</button><button data-v="3">3 s</button><button data-v="5">5 s</button></div>
     <div class="przel"><button id="pelny">Pełny ekran</button><button id="reset">Ustawienia domyślne</button></div>
     <div id="pomoc">Dotknij linii w tekście, żeby przeskoczyć do tego miejsca. Przeciągnij palcem albo kółkiem myszy, żeby przewinąć ręcznie. Pasek zniknie po kilku sekundach, dotknij ekranu żeby wrócić.</div>
   </div>
 </div>
 
 <script>
-const WERSJA = "v3 (23.11.2026)";
+const WERSJA = "v4 (23.11.2026)";
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 document.getElementById("wersja").textContent = WERSJA;
 
 /* ---------- ustawienia (zapis lokalny) ---------- */
-const DOMYSLNE = {wpm:130, rozm:56, fokus:24, szer:92, wyg:42, odst:150, wyr:"center", lustro:false, odl:true};
+const DOMYSLNE = {wpm:130, rozm:56, fokus:5, szer:92, wyg:42, odst:150, wyr:"center", lustro:false, odlSek:3, v:2};
 let S = {...DOMYSLNE};
-try { Object.assign(S, JSON.parse(localStorage.getItem("tp_ust")||"{}")); } catch(e){}
+let zapisane = {}; try { zapisane = JSON.parse(localStorage.getItem("tp_ust")||"{}"); } catch(e){}
+Object.assign(S, zapisane);
+if (!zapisane.v || zapisane.v < 2){ S.fokus = DOMYSLNE.fokus; S.odlSek = S.odl===false ? 0 : 3; S.v = 2; try{ localStorage.setItem("tp_ust", JSON.stringify(S)); }catch(e){} }
 const zapiszUst = () => { try{ localStorage.setItem("tp_ust", JSON.stringify(S)); }catch(e){} };
 
 const $ = id => document.getElementById(id);
@@ -358,8 +362,8 @@ function start(){
   if (pos >= maxPos - 1) pos = 0;
   $("koniec")?.remove();
   const ruszaj = () => { odlTimer=null; gra = true; ostatnie = performance.now(); ostatniaAkcja = performance.now(); $("start").textContent="⏸ Pauza"; blokujEkran(); requestAnimationFrame(petla); };
-  if (S.odl && pos < 2){
-    let n = 3; const o = $("odliczanie"); o.classList.remove("ukryty"); o.textContent = n;
+  if (S.odlSek > 0 && pos < 2){
+    let n = S.odlSek; const o = $("odliczanie"); o.classList.remove("ukryty"); o.textContent = n;
     $("start").textContent="⏸ Anuluj";
     odlTimer = setInterval(() => { n--; if(n<=0){ clearInterval(odlTimer); o.classList.add("ukryty"); ruszaj(); } else o.textContent = n; }, 1000);
     const stary = odlTimer; odlTimer = stary;
@@ -406,7 +410,7 @@ function odswiezPrzyciski(){
   $("odst").value = S.odst; $("v-odst").textContent = S.odst+"%";
   document.querySelectorAll("#przel-wyr button").forEach(b => b.classList.toggle("on", b.dataset.v===S.wyr));
   $("lustro-btn").classList.toggle("on", S.lustro);
-  $("odl-btn").classList.toggle("on", S.odl);
+  document.querySelectorAll("#przel-odl button").forEach(b => b.classList.toggle("on", +b.dataset.v===S.odlSek));
   scena.classList.toggle("lustro", S.lustro);
   const tr = S.lustro ? "scaleX(-1)" : "";
   scena.style.transform = tr; $("linia-pomocnicza").style.transform = tr;
@@ -417,7 +421,7 @@ $("wyg").oninput   = e => { S.wyg=+e.target.value;   zapiszUst(); odswiezPrzycis
 $("odst").oninput  = e => { S.odst=+e.target.value;  zapiszUst(); odswiezPrzyciski(); przebuduj(); };
 document.querySelectorAll("#przel-wyr button").forEach(b => b.onclick = () => { S.wyr=b.dataset.v; zapiszUst(); odswiezPrzyciski(); przebuduj(); });
 $("lustro-btn").onclick = () => { S.lustro=!S.lustro; zapiszUst(); odswiezPrzyciski(); };
-$("odl-btn").onclick = () => { S.odl=!S.odl; zapiszUst(); odswiezPrzyciski(); };
+document.querySelectorAll("#przel-odl button").forEach(b => b.onclick = () => { S.odlSek=+b.dataset.v; zapiszUst(); odswiezPrzyciski(); });
 $("pelny").onclick = pelnyEkran;
 $("reset").onclick = () => { S = {...DOMYSLNE}; zapiszUst(); odswiezPrzyciski(); przebuduj(); };
 function pelnyEkran(){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); }
