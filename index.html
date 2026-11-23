@@ -21,15 +21,24 @@ button.glowny{background:var(--zielen);border-color:#2f7d53;font-weight:700}
 button.glowny:hover{background:#27704a}
 .ukryty{display:none!important}
 
-/* ---------- EKRAN EDYCJI ---------- */
-#edycja{position:fixed;inset:0;display:flex;flex-direction:column;gap:12px;padding:16px;max-width:900px;margin:0 auto}
-#edycja header{display:flex;align-items:center;justify-content:space-between;background:var(--zielen);border-radius:12px;padding:10px 14px}
-#edycja h1{font-size:18px;margin:0}
+/* ---------- EKRANY: LISTA I EDYCJA ---------- */
+.ekran{position:fixed;inset:0;display:flex;flex-direction:column;gap:12px;padding:16px;max-width:900px;margin:0 auto;overflow:hidden}
+.ekran header{display:flex;align-items:center;justify-content:space-between;background:var(--zielen);border-radius:12px;padding:10px 14px;gap:10px}
+.ekran h1{font-size:18px;margin:0}
 #wersja{font-size:12px;opacity:.8}
+button.duzy{font-size:18px;padding:14px}
+#karty{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
+.karta{background:#111;border:1px solid #2c2c2c;border-radius:14px;padding:12px 14px;cursor:pointer}
+.karta:hover{border-color:#2f7d53}
+.karta h3{margin:0 0 4px;font-size:17px}
+.karta .pod{font-size:13px;opacity:.6;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.karta .pre{font-size:14px;opacity:.75;line-height:1.4;max-height:2.8em;overflow:hidden}
+.pusto{opacity:.6;text-align:center;padding:40px 10px;line-height:1.6}
+#tytul{width:100%;background:#111;color:#fff;border:1px solid #333;border-radius:12px;padding:12px 16px;font-size:18px;font-weight:700;font-family:inherit}
+#tytul:focus,#tekst:focus{outline:2px solid var(--zielen)}
 #tekst{flex:1;width:100%;resize:none;background:#111;color:#fff;border:1px solid #333;border-radius:12px;padding:16px;font-size:19px;line-height:1.55;font-family:inherit}
-#tekst:focus{outline:2px solid var(--zielen)}
 .rzad{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.rzad .rozciag{flex:1}
+.rzad .rozciag{flex:1;min-width:180px}
 #info{font-size:14px;opacity:.75}
 .podp{font-size:13px;opacity:.6;line-height:1.5}
 
@@ -74,20 +83,35 @@ button.glowny:hover{background:#27704a}
 </head>
 <body>
 
-<!-- ======== EDYCJA ======== -->
-<div id="edycja">
+<!-- ======== LISTA SCENARIUSZY ======== -->
+<div id="lista" class="ekran">
   <header><h1>🎬 Teleprompter RM</h1><span id="wersja"></span></header>
+  <button id="nowy" class="glowny duzy">＋ Nowy scenariusz</button>
+  <div id="karty"></div>
+  <div class="rzad">
+    <span class="podp rozciag">Scenariusze zapisują się same na tym urządzeniu. Kopia zapasowa pozwala przenieść je na inny telefon albo komputer.</span>
+    <button id="eksport">⬇ Kopia zapasowa</button>
+    <button id="import">⬆ Wczytaj kopię</button>
+    <input type="file" id="plik" accept=".json,application/json" class="ukryty">
+  </div>
+</div>
+
+<!-- ======== EDYCJA ======== -->
+<div id="edycja" class="ekran ukryty">
+  <header><button id="do-listy">← Scenariusze</button><span id="zapisano" class="podp"></span></header>
+  <input id="tytul" placeholder="Tytuł scenariusza (np. Rolka Słoneczna 12)" maxlength="80">
   <textarea id="tekst" placeholder="Wklej tutaj tekst lektora i kliknij „Czytaj”.
 
 Pusta linia = nowy akapit (krótsza pauza w czytaniu).
-Tekst w [nawiasach kwadratowych] to wskazówka dla Ciebie (np. [pauza], [uśmiech], [pokaż na dron]). Pokaże się żółtym kolorem."></textarea>
+Tekst w [nawiasach kwadratowych] to wskazówka dla Ciebie (np. [pauza], [uśmiech], [pokaż dron]). Pokaże się żółtym kolorem."></textarea>
   <div class="rzad">
     <span id="info" class="rozciag"></span>
-    <button id="wklej">📋 Wklej ze schowka</button>
-    <button id="wyczysc">Wyczyść</button>
+    <button id="wklej">📋 Wklej</button>
+    <button id="duplikuj">Duplikuj</button>
+    <button id="usun">🗑 Usuń</button>
     <button id="czytaj-btn" class="glowny">▶ Czytaj</button>
   </div>
-  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> wielkość liter · <b>PgUp</b> cofnij · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>Esc</b> powrót do tekstu. Pilot do prezentacji też działa (następny slajd = start/pauza).</div>
+  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> litery · <b>PgUp</b> cofnij · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>Esc</b> wróć do tekstu. Pilot do prezentacji też działa.</div>
 </div>
 
 <!-- ======== CZYTANIE ======== -->
@@ -128,7 +152,7 @@ Tekst w [nawiasach kwadratowych] to wskazówka dla Ciebie (np. [pauza], [uśmiec
 </div>
 
 <script>
-const WERSJA = "v2 (23.11.2026)";
+const WERSJA = "v3 (23.11.2026)";
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 document.getElementById("wersja").textContent = WERSJA;
 
@@ -139,24 +163,77 @@ try { Object.assign(S, JSON.parse(localStorage.getItem("tp_ust")||"{}")); } catc
 const zapiszUst = () => { try{ localStorage.setItem("tp_ust", JSON.stringify(S)); }catch(e){} };
 
 const $ = id => document.getElementById(id);
-const tekstEl = $("tekst");
-try { tekstEl.value = localStorage.getItem("tp_tekst") || ""; } catch(e){}
-
-/* ---------- ekran edycji ---------- */
+const tekstEl = $("tekst"), tytulEl = $("tytul");
 function liczSlowa(t){ return (t.replace(/\[[^\]]*\]/g," ").match(/\S+/g)||[]).length; }
 function fmt(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
-function odswiezInfo(){
-  const t = tekstEl.value, w = liczSlowa(t);
-  $("info").textContent = w ? `${w} słów · ok. ${fmt(w/S.wpm*60)} przy ${S.wpm} słów/min` : "Wklej tekst, żeby zacząć";
-  try{ localStorage.setItem("tp_tekst", t);}catch(e){}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+/* ---------- biblioteka scenariuszy ---------- */
+let SC = [], aktywny = null;
+try { SC = JSON.parse(localStorage.getItem("tp_scen")||"[]"); } catch(e){ SC = []; }
+// migracja z wersji v1/v2 (jeden tekst)
+try { const stary = localStorage.getItem("tp_tekst"); if (stary && stary.trim() && !SC.length){ SC.push({id:uid(), tytul:"", tekst:stary, utw:Date.now(), zm:Date.now()}); localStorage.setItem("tp_scen", JSON.stringify(SC)); } } catch(e){}
+function zapiszSC(){ try{ localStorage.setItem("tp_scen", JSON.stringify(SC)); return true; }catch(e){ $("zapisano").textContent = "⚠ Nie udało się zapisać (brak miejsca w przeglądarce)"; return false; } }
+function nazwa(sc){ return (sc.tytul||"").trim() || ((sc.tekst||"").trim().split(/\s+/).slice(0,6).join(" ") || "Bez tytułu"); }
+function dataPl(t){ const d=new Date(t); return d.toLocaleDateString("pl-PL",{day:"numeric",month:"short",year:"numeric"})+", "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"}); }
+const biezacy = () => SC.find(x => x.id === aktywny);
+
+function pokazEkran(id){ ["lista","edycja","czytaj"].forEach(e => $(e).classList.toggle("ukryty", e!==id)); }
+
+function rysujListe(){
+  const k = $("karty");
+  if (!SC.length){ k.innerHTML = '<div class="pusto">Nie masz jeszcze żadnych scenariuszy.<br>Kliknij „Nowy scenariusz”, wklej tekst i zapisz go tutaj.</div>'; return; }
+  const kol = [...SC].sort((a,b) => b.zm - a.zm);
+  k.innerHTML = kol.map(sc => { const w = liczSlowa(sc.tekst||"");
+    return `<div class="karta" data-id="${sc.id}"><h3>${esc(nazwa(sc))}</h3><div class="pod"><span>${w} słów</span><span>ok. ${fmt(w/S.wpm*60)}</span><span>zmieniono ${dataPl(sc.zm)}</span>${sc.czyt?`<span>czytano ${dataPl(sc.czyt)}</span>`:""}</div><div class="pre">${esc((sc.tekst||"").trim().slice(0,160))}</div></div>`; }).join("");
 }
-tekstEl.addEventListener("input", odswiezInfo);
-$("wyczysc").onclick = () => { if(!tekstEl.value || confirm("Wyczyścić cały tekst?")){ tekstEl.value=""; odswiezInfo(); tekstEl.focus(); } };
+$("karty").onclick = e => { const c = e.target.closest(".karta"); if (c) otworzEdycje(c.dataset.id); };
+function otworzListe(){ aktywny = null; rysujListe(); pokazEkran("lista"); }
+function otworzEdycje(id){
+  aktywny = id; const sc = biezacy(); if (!sc) return otworzListe();
+  tytulEl.value = sc.tytul||""; tekstEl.value = sc.tekst||"";
+  $("zapisano").textContent = ""; odswiezInfo(); pokazEkran("edycja");
+  if (!sc.tekst) tekstEl.focus();
+}
+$("nowy").onclick = () => { const sc = {id:uid(), tytul:"", tekst:"", utw:Date.now(), zm:Date.now()}; SC.push(sc); zapiszSC(); otworzEdycje(sc.id); };
+$("do-listy").onclick = () => { zapiszTeraz(); const sc = biezacy(); if (sc && !sc.tekst.trim() && !sc.tytul.trim()){ SC = SC.filter(x => x!==sc); zapiszSC(); } otworzListe(); };
+
+let zt;
+function zapiszTeraz(){ clearTimeout(zt); const sc = biezacy(); if(!sc) return; sc.tytul = tytulEl.value; sc.tekst = tekstEl.value; sc.zm = Date.now(); if (zapiszSC()) $("zapisano").textContent = "✓ zapisano"; }
+function odswiezInfo(){
+  const w = liczSlowa(tekstEl.value);
+  $("info").textContent = w ? `${w} słów · ok. ${fmt(w/S.wpm*60)} przy ${S.wpm} słów/min` : "Wklej tekst, żeby zacząć";
+}
+function przyZmianie(){ odswiezInfo(); $("zapisano").textContent = "zapisuję…"; clearTimeout(zt); zt = setTimeout(zapiszTeraz, 500); }
+tekstEl.addEventListener("input", przyZmianie); tytulEl.addEventListener("input", przyZmianie);
+addEventListener("pagehide", () => { if (aktywny && !$("edycja").classList.contains("ukryty")) zapiszTeraz(); });
+
 $("wklej").onclick = async () => {
-  try { tekstEl.value = await navigator.clipboard.readText(); odswiezInfo(); }
+  try { const t = await navigator.clipboard.readText(); if (tekstEl.value.trim() && !confirm("Zastąpić obecny tekst wklejonym?")) return; tekstEl.value = t; przyZmianie(); }
   catch(e){ tekstEl.focus(); alert("Przeglądarka nie dała dostępu do schowka. Kliknij w pole i wklej przez Ctrl+V."); }
 };
-$("czytaj-btn").onclick = () => { if(!tekstEl.value.trim()){ tekstEl.focus(); return; } otworzCzytanie(); };
+$("duplikuj").onclick = () => { zapiszTeraz(); const sc = biezacy(); const n = {id:uid(), tytul:nazwa(sc)+" (kopia)", tekst:sc.tekst, utw:Date.now(), zm:Date.now()}; SC.push(n); zapiszSC(); otworzEdycje(n.id); };
+$("usun").onclick = () => { const sc = biezacy(); if (sc && confirm(`Usunąć scenariusz „${nazwa(sc)}”? Tego nie da się cofnąć.`)){ SC = SC.filter(x => x!==sc); zapiszSC(); otworzListe(); } };
+$("czytaj-btn").onclick = () => { if(!tekstEl.value.trim()){ tekstEl.focus(); return; } zapiszTeraz(); const sc = biezacy(); sc.czyt = Date.now(); zapiszSC(); otworzCzytanie(); };
+
+/* kopia zapasowa */
+$("eksport").onclick = () => {
+  const blob = new Blob([JSON.stringify({aplikacja:"teleprompter-rm", scenariusze:SC}, null, 1)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = "teleprompter-kopia-" + new Date().toISOString().slice(0,10) + ".json"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+};
+$("import").onclick = () => $("plik").click();
+$("plik").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text()); const lista = Array.isArray(d) ? d : d.scenariusze;
+    if (!Array.isArray(lista)) throw 0;
+    let n = 0; lista.forEach(x => { if (x && typeof x.tekst === "string" && !SC.some(y => y.id===x.id)){ SC.push({id:x.id||uid(), tytul:x.tytul||"", tekst:x.tekst, utw:x.utw||Date.now(), zm:x.zm||Date.now(), czyt:x.czyt}); n++; } });
+    zapiszSC(); rysujListe(); alert(`Wczytano ${n} scenariuszy.`);
+  } catch(_){ alert("To nie wygląda na plik kopii z Teleprompter RM."); }
+  e.target.value = "";
+};
 
 /* ---------- czytanie ---------- */
 const scena = $("scena"), zaw = $("zawartosc"), pasek = $("pasek");
@@ -217,7 +294,6 @@ function zbuduj(){
   zaw.firstChild && (zaw.firstChild.style.marginTop = "0px");
   pomiary();
 }
-const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
 function pomiary(){
   const baza = zaw.getBoundingClientRect().top;
@@ -319,7 +395,7 @@ $("wolniej").onclick = () => { zmien("wpm",-10,60,300); };
 $("szybciej").onclick = () => { zmien("wpm",10,60,300); };
 $("mniejsze").onclick = () => { zmien("rozm",-4,24,140); przebuduj(); };
 $("wieksze").onclick = () => { zmien("rozm",4,24,140); przebuduj(); };
-$("wroc").onclick = () => { stop(); $("czytaj").classList.add("ukryty"); $("edycja").classList.remove("ukryty"); odswiezInfo(); };
+$("wroc").onclick = () => { stop(); if (document.fullscreenElement) document.exitFullscreen(); if (biezacy()) otworzEdycje(aktywny); else otworzListe(); };
 $("ust-btn").onclick = () => $("ustawienia").classList.toggle("ukryty");
 
 function odswiezPrzyciski(){
@@ -370,7 +446,7 @@ scena.addEventListener("pointerup", e => {
 scena.addEventListener("wheel", e => { e.preventDefault(); skocz(pos + e.deltaY); }, {passive:false});
 
 addEventListener("keydown", e => {
-  if ($("czytaj").classList.contains("ukryty")) return;
+  if ($("czytaj").classList.contains("ukryty")){ if (e.key==="Escape" && !$("edycja").classList.contains("ukryty")) $("do-listy").click(); return; }
   const k = e.key;
   if (k===" "||k==="PageDown"||k==="ArrowRight"||k==="Enter"){ e.preventDefault(); przelacz(); }
   else if (k==="PageUp"||k==="ArrowLeft"){ e.preventDefault(); linieWstecz(3); }
@@ -387,12 +463,12 @@ addEventListener("keydown", e => {
 let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if($("czytaj").classList.contains("ukryty")) return; przebuduj(); }, 150); });
 
 function otworzCzytanie(){
-  $("edycja").classList.add("ukryty"); $("czytaj").classList.remove("ukryty");
+  pokazEkran("czytaj");
   odswiezPrzyciski(); pos = 0; aktIdx = -1; $("koniec")?.remove();
   zbuduj(); rysuj(true); pasek.classList.remove("schowany");
 }
 
-odswiezPrzyciski(); odswiezInfo();
+odswiezPrzyciski(); otworzListe();
 </script>
 </body>
 </html>
