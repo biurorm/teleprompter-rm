@@ -126,7 +126,7 @@ Tekst w [nawiasach] to wskazówka dla Ciebie (żółta), np. [uśmiech], [pokaż
     <button id="usun">🗑 Usuń</button>
     <button id="czytaj-btn" class="glowny">▶ Czytaj</button>
   </div>
-  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> litery · <b>PgUp</b> cofnij o zdanie · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>E</b> wróć do tekstu. <b>Pilot do prezentacji:</b> następny = start/pauza, poprzedni = cofnij o zdanie, B lub kropka = pauza.</div>
+  <div class="podp">Skróty w czytaniu: <b>Spacja</b> start/pauza · <b>↑ ↓</b> tempo · <b>+ −</b> litery · <b>PgUp</b> cofnij o zdanie · <b>Home</b> od początku · <b>M</b> lustro · <b>F</b> pełny ekran · <b>E</b> wróć do tekstu. <b>Pilot do prezentacji:</b> następny = start/pauza, poprzedni = cofnij o zdanie, B lub kropka = pauza. <b>Pilot Bluetooth do zdjęć:</b> przycisk = start/pauza (na iPhonie przycisk Android).</div>
 </div>
 
 <!-- ======== CZYTANIE ======== -->
@@ -168,12 +168,14 @@ Tekst w [nawiasach] to wskazówka dla Ciebie (żółta), np. [uśmiech], [pokaż
     <label><span>Odliczanie przed startem</span></label>
     <div class="przel" id="przel-odl"><button data-v="0">Bez</button><button data-v="3">3 s</button><button data-v="5">5 s</button></div>
     <div class="przel"><button id="pelny">Pełny ekran</button><button id="reset">Ustawienia domyślne</button></div>
-    <div id="pomoc"><b>Pilot do prezentacji:</b> „następny slajd” = start/pauza, „poprzedni” = cofnij o zdanie, przycisk czarnego ekranu (B lub kropka) = pauza. Dotknij linii w tekście, żeby przeskoczyć do tego miejsca. Przeciągnij palcem albo kółkiem myszy, żeby przewinąć ręcznie. Pasek zniknie po kilku sekundach, dotknij ekranu żeby wrócić.</div>
+    <div id="pomoc"><b>Test pilota:</b> naciśnij przycisk, tu pojawi się, co wysłał: <b id="test-pilota" style="color:var(--akcent)">nic jeszcze</b><br>
+      <b>Pilot Bluetooth do zdjęć</b> (Camera360, Remote Shutter): dowolny przycisk = start/pauza. Na iPhonie i iPadzie działa przycisk <b>Android</b> (mały), bo przycisk iOS to „głośniej”, a tego Safari nie przekazuje stronie.<br>
+      <b>Pilot do prezentacji:</b> „następny slajd” = start/pauza, „poprzedni” = cofnij o zdanie, przycisk czarnego ekranu (B lub kropka) = pauza. Dotknij linii w tekście, żeby przeskoczyć do tego miejsca. Przeciągnij palcem albo kółkiem myszy, żeby przewinąć ręcznie. Pasek zniknie po kilku sekundach, dotknij ekranu żeby wrócić.</div>
   </div>
 </div>
 
 <script>
-const WERSJA = "v6 (23.11.2026)";
+const WERSJA = "v7 (25.11.2026)";
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 document.getElementById("wersja").textContent = WERSJA;
 
@@ -524,14 +526,24 @@ scena.addEventListener("pointerup", e => {
 });
 scena.addEventListener("wheel", e => { e.preventDefault(); skocz(pos + e.deltaY); }, {passive:false});
 
+/* pilot Bluetooth do zdjęć: jeden przycisk potrafi wysłać dwa klawisze naraz (Głośniej + Enter), więc drugi w ciągu 0,6 s ignorujemy */
+const pilotGlosniej = e => e.key==="AudioVolumeUp" || e.key==="VolumeUp" || e.keyCode===175 || e.keyCode===183 || e.keyCode===24;
+const pilotCiszej  = e => e.key==="AudioVolumeDown" || e.key==="VolumeDown" || e.keyCode===174 || e.keyCode===182 || e.keyCode===25;
+let ostPrzelacz = 0;
+function przelaczPilot(){ const t = performance.now(); if (t - ostPrzelacz < 600) return; ostPrzelacz = t; przelacz(); }
+addEventListener("keydown", e => {   // podgląd w ustawieniach: co wysyła pilot
+  const el = $("test-pilota"); if (el) el.textContent = `${e.key || "?"} (kod ${e.keyCode})`;
+}, true);
+
 addEventListener("keydown", e => {
   if ($("czytaj").classList.contains("ukryty")){ if (e.key==="Escape" && !$("edycja").classList.contains("ukryty")) $("do-listy").click(); return; }
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   document.activeElement && document.activeElement.blur && document.activeElement.blur();   // fokus na przycisku nie może dublować klawisza
   const k = e.key;
   // PILOT DO PREZENTACJI: "następny slajd" = start/pauza, "poprzedni" = cofnij o zdanie, "." lub B (czarny ekran) = pauza, F5 = start/pauza
-  if (k===" "||k==="PageDown"||k==="ArrowRight"||k==="Enter"||k==="F5"||k==="MediaTrackNext"){ e.preventDefault(); przelacz(); }
-  else if (k==="PageUp"||k==="ArrowLeft"||k==="z"||k==="Z"||k==="MediaTrackPrevious"){ e.preventDefault(); zdanieWstecz(); }
+  // PILOT BLUETOOTH DO ZDJĘĆ (Camera360 / Remote Shutter): wysyła Enter albo Głośniej, czasem oba naraz = start/pauza; Ciszej = cofnij o zdanie
+  if (pilotGlosniej(e) || k===" "||k==="PageDown"||k==="ArrowRight"||k==="Enter"||k==="F5"||k==="MediaTrackNext"||k==="MediaPlayPause"||k==="Camera"){ e.preventDefault(); if (!e.repeat) przelaczPilot(); }
+  else if (pilotCiszej(e) || k==="PageUp"||k==="ArrowLeft"||k==="z"||k==="Z"||k==="MediaTrackPrevious"){ e.preventDefault(); if (!e.repeat) zdanieWstecz(); }
   else if (k==="."||k==="b"||k==="B"||k==="Escape"){ e.preventDefault(); if (gra || odlTimer) stop(); }
   else if (k==="ArrowUp"){ e.preventDefault(); $("szybciej").click(); }
   else if (k==="ArrowDown"){ e.preventDefault(); $("wolniej").click(); }
